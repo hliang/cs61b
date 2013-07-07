@@ -1,0 +1,765 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 588 768
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk,625 Soda Hall,,
+%%Creator: GNU enscript 1.6.1
+%%CreationDate: Mon Aug 28 15:04:49 2006
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 1
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 1
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 1
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 744 def
+/d_page_h 564 def
+/d_header_x 0 def
+/d_header_y 528 def
+/d_header_w 744 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 744 def
+/d_footer_h 0 def
+/d_output_w 744 def
+/d_output_h 528 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 1 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (08/28/06) def
+/modtimestr (15:04:36) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(                                  CS 61B Lab 1) s
+5 510 M
+(                              September 5-6, 2006) s
+5 494 M
+(Goal:  This lab will give you practice editing and running Java programs,) s
+5 486 M
+(using Emacs, and accessing online Java documentation.) s
+5 470 M
+(There are several things you will need to have your TA check off so you can get) s
+5 462 M
+(credit for this lab.  You can have them checked off all at once when you are) s
+5 454 M
+(finished, but don't wait until the last minute--another lab may start as soon) s
+5 446 M
+(as yours ends, so ask to be checked off when there is still plenty of time.) s
+5 438 M
+(Checkoffs will not be done outside of lab.) s
+5 422 M
+(PART I: Getting started \(1 point\)) s
+5 414 M
+(---------------------------------) s
+5 406 M
+(1. If you are officially registered for a lab--not on the waiting list--you) s
+5 398 M
+(must attend that lab.  Otherwise, find a lab that has space.) s
+5 382 M
+(2. Pick up an account form from your Lab TA.) s
+5 366 M
+(3. Login to a computer using the temporary password on your account form.) s
+5 358 M
+(Answer the questions the computer asks.  Use whatever the registrar uses for) s
+5 350 M
+(your given name and surname.  Your registered name is used for grading.) s
+5 342 M
+(If you mess up and need to correct your answers, run "register" from the Unix) s
+5 334 M
+(prompt.) s
+5 318 M
+(4. Warning:  do not, at this time or any point in the future, delete the) s
+5 310 M
+(.login, .cshrc, and .emacs files in your directory.  If you would like to) s
+5 302 M
+(customize your account, do so by adding new commands to the end of these files,) s
+5 294 M
+(not replacing the files.) s
+5 278 M
+(5. The rest of this lab is a TEAM assignment, with two-person teams.  Introduce) s
+5 270 M
+(yourself to the people to your left and right \(there is one point associated) s
+5 262 M
+(with knowing the names of two other people in the class\).  Choose a partner.) s
+5 254 M
+(If you're the odd person out in the lab, go ahead and begin, but if someone new) s
+5 246 M
+(arrives, partner up with them and help them catch up.) s
+377 510 M
+(PART II: Compile-time errors \(1 point\)) s
+377 502 M
+(--------------------------------------) s
+377 494 M
+(After logging in, you and your partner may find it easier to work on one) s
+377 486 M
+(computer for a while.  However, you should each be separately capable of) s
+377 478 M
+(demonstrating your knowledge of the lab to the TA when it's time to check off.) s
+377 462 M
+(1. Make a lab1 subdirectory:) s
+377 454 M
+(        mkdir lab1) s
+377 438 M
+(2. Change into your lab1 directory:) s
+377 430 M
+(        cd lab1) s
+377 414 M
+(3. Copy the three lab files by typing:) s
+377 406 M
+(        cp $master/lab/lab1/* .) s
+377 390 M
+(IMPORTANT:  You must type the space and the period for this to work!) s
+377 374 M
+(\(Note:  master is a shell variable that refers to the cs61b home directory,) s
+377 366 M
+(which is /home/ff/cs61b.  Typing $master evaluates that variable.  If the cp) s
+377 358 M
+(command above doesn't work, it probably means that something is messed up in) s
+377 350 M
+(your login scripts, so talk to your TA or lab assistant.\)) s
+377 334 M
+(4. Load the program file Names.java into Emacs using C-x C-f.  "C-x" is read) s
+377 326 M
+("control x," and is typed by holding down the control \(Ctrl\) key while typing) s
+377 318 M
+("x".  You may need to type the full pathname lab1/Names.java, then hit Enter.) s
+377 302 M
+(Names.java is a simple program for performing various string operations on a) s
+377 294 M
+(name.  It almost works, but you need to make some changes so that it compiles) s
+377 286 M
+(and runs correctly.) s
+377 270 M
+(5. Compile the program within Emacs using: ) s
+377 262 M
+(        C-x C-e ) s
+377 246 M
+(This will build a command line to run the Java compiler:) s
+377 238 M
+(        javac -g) s
+377 222 M
+("javac" is the name of the Java compiler.  "-g" is a switch to tell the) s
+377 214 M
+(compiler to generate the information the debugger will need.  You need to) s
+377 206 M
+(finish the command line by supplying the name of the file to be compiled:) s
+377 198 M
+(        javac -g Names.java) s
+377 182 M
+(You may instead type this command in an xterm, assuming you're in \(your copy) s
+377 174 M
+(of\) the lab1 directory.) s
+377 158 M
+(6. You will find that javac cannot compile the program.  The code contains two) s
+377 150 M
+(syntax errors which you are quite likely to make when you will write) s
+377 142 M
+(programs. Use the control sequence) s
+377 134 M
+(        C-x `) s
+377 126 M
+(to jump directly to errors found by javac.  \(Be sure to use the single opening) s
+377 118 M
+(quote, not the apostrophe.\)  Figure out what's wrong, correct the errors, save) s
+377 110 M
+(the file using "C-x C-s", and compile the code.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 2 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (08/28/06) def
+/modtimestr (15:04:36) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(PART III: Run-time error \(1 point\)) s
+5 502 M
+(----------------------------------) s
+5 494 M
+(1. Once javac is able to compile the code, it will create a file called) s
+5 486 M
+(Names.class in the same directory.  You can run this program using the Java) s
+5 478 M
+(interpreter.  In a shell \(an xterm or an Emacs buffer called *shell*\), type) s
+5 462 M
+(        java Names) s
+5 446 M
+(Java automatically appends the ".class" file extension on Names.class.  If you) s
+5 438 M
+(accidentally type "java Names.class", Java will look for a file called) s
+5 430 M
+("Names.class.class".) s
+5 414 M
+(The program has an error.  How can you tell there is something wrong?  This) s
+5 406 M
+(type of error, which occurs at run-time, tends to be significantly more) s
+5 398 M
+(difficult to correct than compile-time errors.  \(It's still somewhat easier) s
+5 390 M
+(than discovering an error in which the program appears to finish without) s
+5 382 M
+(problems, but is doing some computation incorrectly.\)  The error message may be) s
+5 374 M
+(hard to read at first, but it will allow you to answer certain questions:  What) s
+5 366 M
+(is the method \(i.e., procedure\) that generated an error?  What is the line) s
+5 358 M
+(number within the file Names.java?) s
+5 342 M
+(The error is in one of the methods in the String class, which is a standard) s
+5 334 M
+(Java library.  Your textbooks contain some documentation of the Java library,) s
+5 326 M
+(but the best source is the online documentation.  To find this, start Firefox) s
+5 318 M
+(by typing) s
+5 302 M
+(        firefox &) s
+5 286 M
+(Double-click on the URL window and type the URL for the class Web page.) s
+5 270 M
+(        http://www.cs.berkeley.edu/~jrs/61b) s
+5 254 M
+(From there, you can find a pointer to the "The Java 2 standard libraries API.") s
+5 246 M
+(There are two libraries that you will be using early in the semester--the) s
+5 238 M
+(java.lang package and the java.io package.  Documentation on String and other) s
+5 230 M
+(standard data types is found in java.lang, so go there and find the String) s
+5 222 M
+(class.  There is a lot of information, not all of which will make sense right) s
+5 214 M
+(now, but you should be able to find a description of the problematic String) s
+5 206 M
+(method.  Be prepared to show your TA or lab assistant how you found this) s
+5 198 M
+(information and how you figured out from it what was wrong with the program.) s
+5 182 M
+(When you think you have found the error, correct it, save the file, recompile) s
+5 174 M
+(it, and execute it to see if the problem is solved.) s
+5 158 M
+(Aside:  You may think that the file produced by javac is named Names.class) s
+5 150 M
+(because the input file is named Names.java.  Not so--the name of the .class) s
+5 142 M
+(file is based on the class name IN Names.java.  To experiment with this, change) s
+5 134 M
+(the line "class Names {" to "class NAMES {" and recompile using javac.  What) s
+5 126 M
+(new file is created?) s
+377 510 M
+(PART IV: Emacs help \(1 point\)) s
+377 502 M
+(-----------------------------) s
+377 494 M
+(1. Load the file "roster.txt" in Emacs.  You will see an unsorted list of) s
+377 486 M
+(names, with each line in the form <surname, given names>.) s
+377 470 M
+(You should use the help facilities of Emacs \(apropos and info\) to find out how) s
+377 462 M
+(to sort all these names by last name.  Then sort the lines of the file. If you) s
+377 454 M
+(are unfamiliar with the help facilities type "C-h ?", and Emacs will guide you) s
+377 446 M
+(through them.) s
+377 430 M
+(Save the result using "C-x C-s".) s
+377 414 M
+(If you have the course reader, take a few minutes to look through it now so you) s
+377 406 M
+(know exactly what information you can look up in it.  Note that the Emacs Quick) s
+377 398 M
+(Reference Guide is in the very front of the reader.  It will be handy to keep) s
+377 390 M
+(your reader by you whenever you're in the lab.) s
+377 374 M
+(PART V: Change your password \(no points\)) s
+377 366 M
+(----------------------------------------) s
+377 358 M
+(Change your account's password using the "passwd" command.  Note that it may) s
+377 350 M
+(take a while for your password change to be stored in the system files, so you) s
+377 342 M
+(may need to use your old password if you login in the interim.) s
+377 326 M
+(Check-off) s
+377 318 M
+(---------) s
+377 310 M
+(When you're done, show your TA or lab assistant your work, and explain how you) s
+377 302 M
+(accessed the Java String documentation and found the bug.) s
+377 286 M
+(1 point:   Show that your Names program works.) s
+377 278 M
+(1 point:   Briefly explain how you discovered and fixed the bugs, and show how) s
+377 270 M
+(           you accessed the Java String documentation.) s
+377 262 M
+(1 point:   Show your sorted roster.txt.) s
+377 254 M
+(1 point:   Tell the TA the names of the students next to you.) s
+377 238 M
+(If you are inexperienced with either Unix or Emacs, you are strongly encouraged) s
+377 230 M
+(to attend one of the help sessions on these topics held by the Computer Science) s
+377 222 M
+(Undergraduate Associaton \(CSUA\).) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF
