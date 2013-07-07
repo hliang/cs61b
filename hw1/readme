@@ -1,0 +1,90 @@
+                              CS 61B Homework 1
+                      Due 4pm Friday, September 8, 2006
+
+This homework assignment is meant to make sure you can write, compile, and run
+simple Java programs.  This is an individual assignment; you may not share
+code with other students.  You will need to know how to compile and run Java
+programs, as described in Lab 1.
+
+Copy the Homework 1 directory by starting from your home directory and typing
+the following:
+        mkdir hw1
+        cd hw1
+        cp $master/hw/hw1/* .
+
+Problem 1
+---------
+Write a program that reads a String from the keyboard.  The program should then
+construct a URL for http://www.X.com/, replacing X with the String read in, and
+print the first five lines of the Web page at that URL in REVERSE ORDER; i.e.,
+the fifth, fourth, third, second, and first lines.
+
+We've already created a skeleton for you in the file OpenCommercial.java; you
+just need to fill it in.  Use the println method to print each of the five
+lines, so that there's a carriage return at the end of each line.
+
+To receive credit for this problem, you must follow these directions exactly:
+
+        1) Your solution must be in a file called OpenCommercial.java .
+        2) Do not edit any of the lines before the line that says 
+           "Replace this comment with your solution."
+        3) Your program must print only five lines from the given home page,
+           and must print them in reverse order.  Do not add any extraneous
+           println statements.  Do not modify the lines before printing them.
+           The program skeleton we've given you prints a prompt before reading
+           the String; don't change this prompt.  Your program must produce
+           EXACTLY the same output as our solution, because we will be using an
+           automatic grading program dumber than a microwave oven.
+
+Before you submit your solution, be sure to try compiling your program ON THE
+LAB MACHINES with "javac -g OpenCommercial.java", and be sure to try running
+your program ON THE LAB MACHINES using "java OpenCommercial".  If you are
+working from home, be aware that there might be slight differences between your
+Java installation and ours, so you should always test your code on the lab
+machines just before you submit it.  No partial credit will be given for
+programs that don't produce a portion of a Web page.
+
+
+Problem 2
+---------
+Write a program called "Nuke2.java" containing a class called Nuke2 whose main
+method reads a string from the keyboard and prints the same string, with its
+second character removed.  (That's character number 1, since Java numbers
+characters in a string starting from zero.)  In other words, after you run
+"java Nuke2", if you type in the string "skin", the program will print "sin".
+
+(Note:  your program might crash with an error message if you type in a string
+containing fewer than two characters.  That's okay; your program only needs to
+work correctly on strings at least two characters long.)
+
+To receive credit for this problem, you must follow these directions exactly:
+
+        1) Your solution must be in a file called Nuke2.java, and the main
+           program must be in a class called Nuke2.
+        2) Your program must read just one string, then print the same string
+           with the second character omitted, then exit.  Do not print anything
+           else.  In particular, do not print a prompt.
+
+Again, be certain that your program compiles and runs correctly on the lab
+machines before you submit it!  The automatic grader is not charitable.
+
+Submitting your solution
+------------------------
+Warning: the submit command probably won't work until up to 24 hours after you
+login to a lab machine for the first time.
+
+Make sure your programs run correctly on the lab machines.  Change (cd) to your
+hw1 directory, which should contain OpenCommercial.java and Nuke2.java.  Type
+"submit hw1".
+
+After submitting, if you realize one of your programs is flawed, you may fix
+it and submit again.  You will have to resubmit both files, even if you only
+change one.  You may submit as often as you like.  Only the last version you
+submit before the deadline will be graded.
+
+If you only manage to do one of the problems before the deadline, you'll have
+to create an empty file with the name of the other program so that "submit hw1"
+will work.
+
+This will be the standard procedure for submitting future homeworks and
+projects as well.
