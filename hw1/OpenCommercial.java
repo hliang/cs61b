@@ -45,7 +45,7 @@ class OpenCommercial {
     // Read URL contents one line a time, and store that line in the string variable
     while((oneInputLine = urlContent.readLine()) != null && i < firstFiveLines.length) {
 	// System.out.println("====");
-	firstFiveLines[i] = oneInputLine + i;
+	firstFiveLines[i] = oneInputLine;
         // System.out.println(firstFiveLines[i] + i);
 	i++;
         // System.out.println(oneInputLine + i);
