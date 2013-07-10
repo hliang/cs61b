@@ -110,10 +110,11 @@ program.
 Here is a recursive GCD function written in Scheme.  a and b must be
 non-negative.
 
-  (define (gcd a b)
-    (if (= b 0)	
-      a
-      (gcd b (remainder a b))))
+  function gcd(a, b)
+    if b = 0
+      return a
+    else
+      return gcd(b, a mod b)
 
 The "remainder" operation in Java is called "mod" for "modular arithmetic" and
 is written "a % b".
