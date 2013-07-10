@@ -1,0 +1,707 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 588 768
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk,625 Soda Hall,,
+%%Creator: GNU enscript 1.6.1
+%%CreationDate: Sun Sep 10 18:50:19 2006
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 1
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 1
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 1
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 744 def
+/d_page_h 564 def
+/d_header_x 0 def
+/d_header_y 528 def
+/d_header_w 744 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 744 def
+/d_footer_h 0 def
+/d_output_w 744 def
+/d_output_h 528 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 1 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (09/10/06) def
+/modtimestr (18:49:01) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(                                 CS 61B  Lab 2) s
+5 510 M
+(                             September 12-13, 2006) s
+5 494 M
+(Goal:  This lab will give you experience with defining and using classes and) s
+5 486 M
+(fields, and with conditionals and recursive functions.) s
+5 470 M
+(Copy the Lab 2 directory by starting from your home directory and typing:) s
+5 462 M
+(  mkdir lab2) s
+5 454 M
+(  cd lab2) s
+5 446 M
+(  cp $master/lab/lab2/* .) s
+5 430 M
+(Getting Started) s
+5 422 M
+(---------------) s
+5 414 M
+(Read the Fraction.java class into emacs and compile it using C-x C-e, filling) s
+5 406 M
+(in the command javac -g Fraction.java.  The program should compile without) s
+5 398 M
+(errors.  In a shell window, from your lab2 directory, run the program using) s
+5 390 M
+("java Fraction".  The program should run, although it will print fractions in) s
+5 382 M
+(a non-reduced form, like 12/20.) s
+5 366 M
+(Part I:  Constructors \(1 point\)) s
+5 358 M
+(-------------------------------) s
+5 350 M
+(Look at the main method in the Fraction class, which declares and constructs) s
+5 342 M
+(four Fraction objects.  Four different constructors are used, each with) s
+5 334 M
+(different parameters.) s
+5 318 M
+(  Fraction f0 = new Fraction\(\);) s
+5 310 M
+(  Fraction f1 = new Fraction\(3\);) s
+5 302 M
+(  Fraction f2 = new Fraction\(12, 20\);) s
+5 294 M
+(  Fraction f3 = new Fraction\(f2\);) s
+5 278 M
+(Look at the implementations of the constructors.  The two-parameter constructor) s
+5 270 M
+(is straightforward.  It assigns the parameters to the numerator and denominator) s
+5 262 M
+(fields.  The constructor with one int parameter uses some new syntax:) s
+5 246 M
+(  this\(n, 1\);) s
+5 230 M
+(The effect of this statement is to call the two-parameter constructor, passing) s
+5 222 M
+(n and 1 as parameters.  "this" is a keyword in Java, which normally refers to) s
+5 214 M
+(the object on which a method is invoked.  In a constructor, it can be used \(as) s
+5 206 M
+(above\) to invoke a constructor from within another constructor.) s
+5 190 M
+(We could have written the one-parameter constructor thusly:) s
+5 174 M
+(  public Fraction\(int n\) {) s
+5 166 M
+(    if \(n < 0\) {) s
+5 158 M
+(      System.out.println\("Fatal error:  Negative numerator."\);) s
+5 150 M
+(      System.exit\(0\);) s
+5 142 M
+(    }) s
+5 134 M
+(    numberOfFractions++;) s
+5 126 M
+(    numerator = n;) s
+5 118 M
+(    denominator = 1;) s
+5 110 M
+(  }) s
+5 94 M
+(Why call the two-parameter constructor instead?  The reason is one of good) s
+5 86 M
+(software engineering:  by having three of the constructors call the fourth, we) s
+5 78 M
+(have reduced duplicate code--namely, the error-checking code and fraction) s
+5 70 M
+(counting code in the first constructor.  By reusing code this way, the program) s
+5 62 M
+(is shorter, and more importantly, if we later find a bug in the constructor, we) s
+5 54 M
+(might only need to fix the first constructor to fix all of them.) s
+5 38 M
+(This principle applies to methods in general, not just constructors.  In your) s
+5 30 M
+(own programs, if you find yourself copying several lines of code for reuse, it) s
+5 22 M
+(is usually wise to put the common code into a new shared method.) s
+5 6 M
+(The no-parameter constructor does not use the good style just described.) s
+377 518 M
+(Modify it to call the two-parameter constructor.  Then, fill in the fourth) s
+377 510 M
+(constructor so that it uses the good style and correctly duplicates the input) s
+377 502 M
+(Fraction \(it does neither now\).  Your TA or lab assistant will ask to see your) s
+377 494 M
+(constructors when you get checked off.) s
+377 478 M
+(Part II:  Using Objects \(1 point\)) s
+377 470 M
+(---------------------------------) s
+377 462 M
+(Further on in the main method, there are four lines commented out.  Remove the) s
+377 454 M
+(comment markers and fill in the two missing expressions so that sumOfTwo is the) s
+377 446 M
+(sum of f1 and f2, and sumOfThree is the sum of f0, f1, and f2.) s
+377 430 M
+(Part III:  Defining Classes \(1 point\)) s
+377 422 M
+(-------------------------------------) s
+377 414 M
+(The changeNumerator and fracs methods don't work.  Fix them.  You may NOT) s
+377 406 M
+(change their signatures.  Each fix should require the addition of just one) s
+377 398 M
+(word.  These changes may or may not be in the methods themselves.) s
+377 382 M
+(Part IV:  Conditionals and Recursive Functions \(1 point\)) s
+377 374 M
+(--------------------------------------------------------) s
+377 366 M
+(The main method prints the Fractions thusly:) s
+377 350 M
+(  System.out.println\("The fraction f0 is " + f0.toString\(\)\); ) s
+377 342 M
+(  System.out.println\("The fraction f1 is " + f1\);   // toString is implicit) s
+377 334 M
+(  System.out.println\("The fraction f2 is " + f2\);) s
+377 326 M
+(  System.out.println\("The fraction f3 is " + f3 + ", which should equal f2"\);) s
+377 310 M
+(How does Java know what to do when printing the fractions f1, f2, and f3?  In) s
+377 302 M
+(the case of f0, we have invoked the toString method, which you should look at.) s
+377 286 M
+(In the next three lines, we are asking Java to concatenate a Fraction to the) s
+377 278 M
+(end of a String.  A Fraction is not a String, so can't be concatenated) s
+377 270 M
+(directly, but Java cleverly looks for a method called toString to convert each) s
+377 262 M
+(Fraction to a string.  This is standard in Java:  any object can have a) s
+377 254 M
+(toString method, and if it does, that method will be automatically called when) s
+377 246 M
+(you concatenate the object to a String.) s
+377 230 M
+(As we noted earlier, the toString method prints a Fraction in non-reduced form.) s
+377 222 M
+(Examine the code in the toString method.  It is calling another method called) s
+377 214 M
+(gcd that computes the greatest common divisor \(GCD\) of two positive integers.) s
+377 206 M
+(If this method worked correctly, toString would print Fractions in reduced) s
+377 198 M
+(form; instead, gcd always returns 1.  Rewrite the body of gcd so that it is a) s
+377 190 M
+(recursive function that correctly computes the GCD.  Recompile and run your) s
+377 182 M
+(program.) s
+377 166 M
+(Here is a recursive GCD function written in Scheme.  a and b must be) s
+377 158 M
+(non-negative.) s
+377 142 M
+(  \(define \(gcd a b\)) s
+377 134 M
+(    \(if \(= b 0\) ) s
+377 126 M
+(      a) s
+377 118 M
+(      \(gcd b \(remainder a b\)\)\)\)) s
+377 102 M
+(The "remainder" operation in Java is called "mod" for "modular arithmetic" and) s
+377 94 M
+(is written "a % b".) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 2 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (09/10/06) def
+/modtimestr (18:49:01) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(Check-off) s
+5 502 M
+(---------) s
+5 494 M
+(1 point:  Show the TA or lab assistant your last two Fraction constructors.) s
+5 486 M
+(          Run your program to demonstrate that f2 and f3 are initially equal.) s
+5 478 M
+(1 point:  Demonstrate that your program correctly computes the two sums of) s
+5 470 M
+(          fractions.) s
+5 462 M
+(1 point:  Demonstrate that your program changes f3 to 7/20, and prints the) s
+5 454 M
+(          correct number of Fraction objects.  Tell the TA or lab assistant) s
+5 446 M
+(          what two words you had to add to fix these bugs.) s
+5 438 M
+(1 point:  Demonstrate your program that correctly computes GCDs and fractions) s
+5 430 M
+(          in reduced form.) s
+_R
+S
+%%Trailer
+%%Pages: 2
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF
