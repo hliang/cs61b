@@ -11,6 +11,7 @@
 public class SList {
 
   private SListNode head;
+  private SListNode tail; // add to maintain tail to provide constant-time insertEnd
   private int size;
 
   /**
@@ -20,6 +21,7 @@ public class SList {
   public SList() {
     size = 0;
     head = null;
+    tail = null;
   }
 
   /**
@@ -47,6 +49,9 @@ public class SList {
 
   public void insertFront(Object obj) {
     head = new SListNode(obj, head);
+    if (tail == null) {
+      tail = head;
+    }
     size++;
   }
 
@@ -56,6 +61,7 @@ public class SList {
    **/
 
   public void insertEnd(Object obj) {
+    /*
     if (head == null) {
       head = new SListNode(obj);
     } else {
@@ -66,6 +72,16 @@ public class SList {
       node.next = new SListNode(obj);
     }
     size++;
+    */
+    if (tail == null) {
+      tail = new SListNode(obj);
+      head = tail;
+    } else {
+      tail.next = new SListNode(obj);
+      tail = tail.next;
+    }
+    size++;
+    
   }
 
   /**
@@ -124,6 +140,14 @@ public class SList {
 
   public static void main (String[] args) {
     // Fill in your solution for Part I here.
+
+    SList slist1 = new SList();
+    slist1.insertFront(new Integer(9));
+    slist1.insertEnd(new Integer(12));
+    slist1.insertFront(new Integer(6));
+    slist1.insertFront(3);
+    slist1.insertEnd(15);
+    System.out.println("Here is a list:" + slist1);
 
     testEmpty();
     testAfterInsertFront();
