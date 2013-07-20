@@ -1,5 +1,7 @@
 /* Homework3.java */
 
+import java.util.Arrays;
+
 public class Homework3 {
 
   /**
@@ -21,6 +23,19 @@ public class Homework3 {
   public static void smoosh(int[] ints) {
     // Fill in your solution here.  (Ours is fourteen lines long, not counting
     // blank lines or lines already present in this file.)
+    int lastInt = ints[0];
+    int j = 1;  // number of valid items.
+    for (int i = 1; i < ints.length; i++) {
+      if (ints[i] != lastInt) {
+        ints[j] = ints[i];
+	j++;
+      }
+      lastInt = ints[i];
+    }
+    // fill the rest with -1
+    for (int k = j; k < ints.length; k++) {
+      ints[k] = -1;
+    }
   }
 
   /**
