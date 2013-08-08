@@ -1,0 +1,1163 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 588 768
+%%Title: Enscript Output
+%%For: Jonathan Shewchuk,625 Soda Hall,,
+%%Creator: GNU enscript 1.6.1
+%%CreationDate: Wed Sep 13 22:14:21 2006
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 1
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 1
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 7 7 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 1
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 744 def
+/d_page_h 564 def
+/d_header_x 0 def
+/d_header_y 528 def
+/d_header_w 744 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 744 def
+/d_footer_h 0 def
+/d_output_w 744 def
+/d_output_h 528 def
+/cols 2 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 1 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (09/13/06) def
+/modtimestr (22:13:12) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 518 M
+(                               CS 61B  Project 1) s
+5 510 M
+(                                Sharks and Fish) s
+5 502 M
+(                      Due 4pm Friday, September 29, 2006) s
+5 486 M
+(Warning:  This project is time-consuming.  Start early.) s
+5 470 M
+(This is an individual assignment; you may not share code with other students.) s
+5 454 M
+(Getting started: You will find the code for this assignment in $master/hw/pj1/.) s
+5 446 M
+(Start by copying it into your own pj1 directory.) s
+5 430 M
+(In this project you will implement a simulation of an ocean containing sharks) s
+5 422 M
+(and fish.  You will also write code to convert an ocean into a run-length) s
+5 414 M
+(encoding and back.  The ocean is rectangular, but the edges are connected) s
+5 406 M
+(together in a topological donut or torus.  This means that the top \(North\) and) s
+5 398 M
+(bottom \(South\) edges are considered adjacent, so if you start at the top edge) s
+5 390 M
+(and go up, you'll be at the bottom edge \(just like in the video game) s
+5 382 M
+(Asteroids\).  Similarly, the East and West edges are connected \(just like in) s
+5 374 M
+(Pac Man\).  The ocean is divided into square cells, which are indexed as follows) s
+5 366 M
+(\(for a 4x3 ocean\):) s
+5 350 M
+(                         ------> x) s
+5 334 M
+(                     |   -----------------------------) s
+5 326 M
+(                     |   | 0, 0 | 1, 0 | 2, 0 | 3, 0 |) s
+5 318 M
+(                   y |   -----------------------------) s
+5 310 M
+(                     |   | 0, 1 | 1, 1 | 2, 1 | 3, 1 |) s
+5 302 M
+(                     v   -----------------------------) s
+5 294 M
+(                         | 0, 2 | 1, 2 | 2, 2 | 3, 2 |) s
+5 286 M
+(                         -----------------------------) s
+5 270 M
+(Note that the origin is in the upper left; the x-coordinate increases as you) s
+5 262 M
+(move right, and the y-coordinate increases as you go down.  \(This conforms to) s
+5 254 M
+(Java's graphics commands, though you won't need to use them directly in this) s
+5 246 M
+(project.\)  You can also refer to locations such as \(4, 0\) or \(-4, 3\), which are) s
+5 238 M
+(both the same as \(0, 0\) in a 4x3 ocean.  \(More generally, the coordinates in) s
+5 230 M
+(an ixj ocean are taken modulo i for the x-coordinate, which is horizontal, and) s
+5 222 M
+(modulo j for the y-coordinate, which is vertical.\)  Any pair of integers will) s
+5 214 M
+(give you a valid position in the grid by "wrapping around" at the edges.) s
+5 198 M
+(\(Hint:  programming will be a lot easier if you write helper functions that do) s
+5 190 M
+(the wrapping around for you, and use them in all your methods, so you don't) s
+5 182 M
+(have to think about it again.\)) s
+5 166 M
+(There are two kinds of entities in this ocean:  sharks and fish.  The sharks) s
+5 158 M
+(and fish breed, eat, and die in the ocean.  Each cell of the grid can be) s
+5 150 M
+(occupied by a single shark or fish, or it can be empty.) s
+377 510 M
+(Part I:  Simulating Sharks and Fish) s
+377 502 M
+(===================================) s
+377 494 M
+(This part is worth 40% of your total score.  \(8 points out of 20\).) s
+377 478 M
+(An ocean is described by its size and the initial placement of sharks and fish) s
+377 470 M
+(in the ocean.  It is also described by a parameter called the "starveTime" for) s
+377 462 M
+(a shark.  This is the number of simulation timesteps that a shark can live) s
+377 454 M
+(through without eating.) s
+377 438 M
+(The simulation proceeds in timesteps.  A "timestep" is a _transition_ from one) s
+377 430 M
+(ocean to the next.  \(Don't confuse timesteps with oceans; every timestep starts) s
+377 422 M
+(with one ocean and ends with another.\)  The rules for how the ocean looks at) s
+377 414 M
+(the end of a timestep depend only on the occupants of the cells at the) s
+377 406 M
+(beginning of the timestep.  Therefore, to obtain correct behavior, you will) s
+377 398 M
+(often be working with two copies of the ocean simultaneously; one representing) s
+377 390 M
+(the ocean at the beginning of the timestep, and the other representing the) s
+377 382 M
+(ocean at the end of the timestep.  \(If you are foolish enough to try to) s
+377 374 M
+(implement a timestep using just a single Ocean object, you will modify the) s
+377 366 M
+(values of cells whose old values are still needed to compute the new values for) s
+377 358 M
+(other cells, and thus you will compute the wrong answer.\)) s
+377 342 M
+(The contents of any particular cell at the end of a timestep depend only on the) s
+377 334 M
+(contents of that cell and its eight neighbors at the beginning of the timestep.) s
+377 326 M
+(The "neighbors" are the eight adjacent cells:  the cells immediately to the) s
+377 318 M
+(north, south, east, and west, as well as the four diagonal neighbors.  Here are) s
+377 310 M
+(the rules:) s
+377 294 M
+(1\) If a cell contains a shark, and any of its neighbors is a fish, then the) s
+377 286 M
+(shark eats during the timestep, and it remains in the cell at the end of the) s
+377 278 M
+(timestep.  \(We may have multiple sharks sharing the same fish.  This is fine;) s
+377 270 M
+(they all get enough to eat.\)) s
+377 254 M
+(2\) If a cell contains a shark, and none of its neighbors is a fish, it gets) s
+377 246 M
+(hungrier during the timestep.  If this timestep is the \(starveTime + 1\)th) s
+377 238 M
+(timestep the shark has gone through without eating, then the shark dies) s
+377 230 M
+(\(disappears\).  Otherwise, it remains in the cell.  An example demonstrating) s
+377 222 M
+(this rule appears below.) s
+377 206 M
+(3\) If a cell contains a fish, and all of its neighbors are either empty or are) s
+377 198 M
+(other fish, then the fish stays where it is.) s
+377 182 M
+(4\) If a cell contains a fish, and one of its neighbors is a shark, then the) s
+377 174 M
+(fish is eaten by a shark, and therefore disappears.) s
+377 158 M
+(5\) If a cell contains a fish, and two or more of its neighbors are sharks, then) s
+377 150 M
+(a new shark is born in that cell.  Sharks are well-fed at birth; _after_ they) s
+377 142 M
+(are born, they can survive an additional starveTime timesteps without eating.) s
+377 134 M
+(\(But they will die at the end of starveTime + 1 consecutive timesteps without) s
+377 126 M
+(eating.\)) s
+377 110 M
+(6\) If a cell is empty, and fewer than two of its neighbors are fish, then the) s
+377 102 M
+(cell remains empty.) s
+377 86 M
+(7\) If a cell is empty, at least two of its neighbors are fish, and at most one) s
+377 78 M
+(of its neighbors is a shark, then a new fish is born in that cell.) s
+377 62 M
+(8\) If a cell is empty, at least two of its neighbors are fish, and at least two) s
+377 54 M
+(of its neighbors are sharks, then a new shark is born in that cell.  \(The new) s
+377 46 M
+(shark is well-fed at birth, even though it hasn't eaten a fish yet.\)) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 2 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (09/13/06) def
+/modtimestr (22:13:12) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(starveTime Examples) s
+5 502 M
+(-------------------) s
+5 494 M
+(The following example demonstrates exactly when sharks die.  Suppose the) s
+5 486 M
+(starveTime is 3.  Suppose the initial ocean, Ocean 0, contains a well-fed) s
+5 478 M
+(shark \(A\).  If that shark never gets to eat, it will survive three timesteps) s
+5 470 M
+(without food, making it to Ocean 3; but it will be dead by Ocean 4.  Another) s
+5 462 M
+(shark is born in Ocean 1, and is fed during the transition from Ocean 2 to) s
+5 454 M
+(Ocean 3, but is never fed again.  It survives to Ocean 6, but it is dead by) s
+5 446 M
+(Ocean 7.) s
+5 430 M
+(Ocean 0    shark A \(well-fed\)          [empty cell]) s
+5 422 M
+(timestep                               shark B born) s
+5 414 M
+(Ocean 1    shark A                     shark B \(well-fed\)) s
+5 406 M
+(timestep) s
+5 398 M
+(Ocean 2    shark A                     shark B) s
+5 390 M
+(timestep                               shark B eats a fish \(born last timestep\)) s
+5 382 M
+(Ocean 3    shark A                     shark B \(well-fed\)) s
+5 374 M
+(timestep   shark A dies) s
+5 366 M
+(Ocean 4    [empty cell]                shark B) s
+5 358 M
+(timestep) s
+5 350 M
+(Ocean 5                                shark B) s
+5 342 M
+(timestep) s
+5 334 M
+(Ocean 6                                shark B) s
+5 326 M
+(timestep                               shark B dies) s
+5 318 M
+(Ocean 7                                [empty cell]) s
+5 302 M
+(Your task) s
+5 294 M
+(---------) s
+5 286 M
+(Fill in the implementation of the Ocean class.  We have already provided you) s
+5 278 M
+(with the public method definitions you will need.  You are required to provide) s
+5 270 M
+(implementations of all the methods whose prototypes appear in Ocean.java.) s
+5 262 M
+(Among these methods is a constructor that takes three integers as input,) s
+5 254 M
+(representing the size of the ocean and the starveTime of the sharks, and) s
+5 246 M
+(returns an ocean of the specified size.  For example, the statement) s
+5 230 M
+(    Ocean sea = new Ocean\(i, j, starveTime\);) s
+5 214 M
+(should create an ixj Ocean object.  In your implementation, you may define any) s
+5 206 M
+(fields, additional methods, additional classes, or other .java files you wish,) s
+5 198 M
+(but you cannot change the prototypes in Ocean.java.  We will test your code by) s
+5 190 M
+(calling your methods directly, so it is important that you follow this rule.) s
+5 182 M
+(You should read Ocean.java carefully for an explanation of what methods you) s
+5 174 M
+(must write.  The most important of these is timeStep\(\), the method that) s
+5 166 M
+(performs your simulation.) s
+5 150 M
+(Your Ocean class should represent the ocean as one or more simple two-) s
+5 142 M
+(dimensional arrays.  It is up to you decide how to represent each element of) s
+5 134 M
+(the array \(in particular, whether it is empty or contains a shark or fish, and) s
+5 126 M
+(if it's a shark, how long ago it last ate\).  Your internal representation is) s
+5 118 M
+(not required to use the constants EMPTY, SHARK, and FISH, which are part of the) s
+5 110 M
+(public interface, but it can if you want.  However, the cellContents\(\) method) s
+5 102 M
+(must return these constants--you cannot change this part of the interface.) s
+5 86 M
+(We have provided Java classes to help you debug your implementation and animate) s
+5 78 M
+(your ocean, in these files:) s
+5 62 M
+(    Simulation.java) s
+5 54 M
+(    SimText.java) s
+5 38 M
+(The Simulation and SimText classes \(which consist primarily of a simulation) s
+5 30 M
+(driver called main\) generate random input to initialize the ocean, and animate) s
+5 22 M
+(the sequence of oceans returned by the timeStep method of your Ocean class.  So) s
+5 14 M
+(that they can initialize your Ocean and monitor the fish and sharks in your) s
+5 6 M
+(Ocean during the simulation, you must implement the methods addFish, addShark,) s
+377 518 M
+(cellContents, width, and height.) s
+377 502 M
+(The Simulation and SimText programs take up to three command-line parameters.) s
+377 494 M
+(The first two specify the width and height of the ocean.  The third parameter) s
+377 486 M
+(specifies the value of starveTime.  For example, if you run) s
+377 470 M
+(    java Simulation 25 30 1) s
+377 454 M
+(then Simulation will animate a 25x30 ocean with a starveTime of 1.  If you run) s
+377 446 M
+("java Simulation" with no parameters, by default Simulation will animate a) s
+377 438 M
+(80x80 ocean with a starveTime of 3.  \(SimText animates a 50x25 ocean using text) s
+377 430 M
+(on your terminal.\)  With some choices of parameters, the ocean quickly dies) s
+377 422 M
+(out; with others, it teems forever.) s
+377 406 M
+(In the animation produced by Simulation, sharks are red squares and fish are) s
+377 398 M
+(green squares.  In the animation produced by SimText, sharks are 'S' characters) s
+377 390 M
+(and fish are '~' characters.  Simulation is more fun to watch, but SimText may) s
+377 382 M
+(be easier to use for debugging and remote access.) s
+377 366 M
+(Part II:  Converting a Run-Length Encoding to an Ocean) s
+377 358 M
+(======================================================) s
+377 350 M
+(This part is worth 25% of your total score.  \(5 points out of 20\).) s
+377 334 M
+(For a large ocean, an Ocean object can consume quite a bit of memory or disk) s
+377 326 M
+(space.  For long-term storage, we can store an Ocean more efficiently if we) s
+377 318 M
+(represent it as a "run-length encoding."  Imagine taking all the rows of cells) s
+377 310 M
+(in the ocean, and connecting them into one long strip.  Think of the cells as) s
+377 302 M
+(being numbered thusly:) s
+377 286 M
+(                        -----------------------------) s
+377 278 M
+(                        |   0  |   1  |   2  |   3  |) s
+377 270 M
+(                        -----------------------------) s
+377 262 M
+(                        |   4  |   5  |   6  |   7  |) s
+377 254 M
+(                        -----------------------------) s
+377 246 M
+(                        |   8  |   9  |  10  |  11  |) s
+377 238 M
+(                        -----------------------------) s
+377 222 M
+(Typically, many regions of this strip are "runs" of many empty cells in a row,) s
+377 214 M
+(or many fish in a row, or many equally-hungry sharks in a row.  Run-length) s
+377 206 M
+(encoding is a technique in which a sequence of identical consecutive cells are) s
+377 198 M
+(represented as a single record or object.  For instance, the following strip of) s
+377 190 M
+(fish \(F\), sharks fed two timesteps ago \(S2\), and empty cells \(.\):) s
+377 174 M
+(            ------------------------------------------------------) s
+377 166 M
+(            | F | F | F | S2 | S2 | S2 | S2 | S2 | . | . | . | . |) s
+377 158 M
+(            ------------------------------------------------------) s
+377 142 M
+(could be represented with just three records, each representing one "run":) s
+377 126 M
+(                              ------------------) s
+377 118 M
+(                              | F3 | S2,5 | .4 |) s
+377 110 M
+(                              ------------------) s
+377 94 M
+("F3" means that there are three consecutive fish, followed by "S2,5", meaning) s
+377 86 M
+(five consecutive sharks fed two timesteps ago, and then ".4":  four empty) s
+377 78 M
+(cells.  With this encoding, a huge ocean with just a few fish or sharks can be) s
+377 70 M
+(stored in a tiny amount of memory.  \(Note, however, that a shark that just ate) s
+377 62 M
+(cannot be represented together with a shark that hasn't eaten in the last) s
+377 54 M
+(timestep.  For a correct encoding, you must separate sharks based on their) s
+377 46 M
+(hunger!\)  If you are familiar with .GIF image files \(often encountered on the) s
+377 38 M
+(Web\), you might be interested to know that they use run-length encoding to) s
+377 30 M
+(reduce their sizes.) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 3 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (09/13/06) def
+/modtimestr (22:13:12) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(Your task is to implement a RunLengthEncoding class, which represents a) s
+5 502 M
+(run-length encoding as a linked list of "run" objects.  It is up to you whether) s
+5 494 M
+(to use a singly- or doubly-linked list, but a doubly-linked list may make Part) s
+5 486 M
+(IV easier.) s
+5 470 M
+(Because this is a data structures course, please use your own list class\(es\) or) s
+5 462 M
+(ones you have learned in class.  In future courses, it will sometimes make more) s
+5 454 M
+(sense for you to use a linked list class written by somebody else, such as) s
+5 446 M
+(java.util.LinkedList.  However, in CS 61B this is forbidden, because I want you) s
+5 438 M
+(to be always aware of exactly how your data structures work.  Likewise, you may) s
+5 430 M
+(not use java.util.Vector or other built-in data structures.) s
+5 414 M
+(Part II\(a\):  Implement two constructors for RunLengthEncodings.  One constructs) s
+5 406 M
+(a run-length encoding of an empty ocean, and the other constructs a run-length) s
+5 398 M
+(encoding based on two arrays provided as parameters to the constructor.  These) s
+5 390 M
+(arrays represent the runs that your run-length coding should contain, so you) s
+5 382 M
+(are simply converting arrays to a linked list.  \(See the prototype in) s
+5 374 M
+(RunLengthEncoding.java.\)) s
+5 358 M
+(Part II\(b\):  Your run-length encodings will only be useful if other classes) s
+5 350 M
+(have the ability to read them after you create them.  Therefore, implement the) s
+5 342 M
+(nextRun\(\) and restartRuns\(\) methods.  These two methods work together to return) s
+5 334 M
+(all the runs in a run-length encoding to an outside application, one by one.) s
+5 326 M
+(Each time nextRun\(\) is invoked, it returns a different run--represented as a) s
+5 318 M
+(TypeAndSize object--until every run has been returned.  The first time) s
+5 310 M
+(nextRun\(\) is invoked, it returns the first run in the encoding, which contains) s
+5 302 M
+(cell \(0, 0\).  After every run has been returned, nextRun\(\) returns null, which) s
+5 294 M
+(lets the calling program know that there are no more runs in the encoding.) s
+5 278 M
+(The restartRuns\(\) method resets the enumeration, so that nextRun\(\) will once) s
+5 270 M
+(again return the first run as if it were being called for the first time.) s
+5 262 M
+(Warning:  the test code will not necessarily call restartRuns\(\) before the) s
+5 254 M
+(first time nextRun\(\) is called.) s
+5 238 M
+(IMPORTANT NOTE on nextRun\(\) and restartRuns\(\):  your methods in the) s
+5 230 M
+(RunLengthEncoding class should never call these methods.  The nextRun\(\) and) s
+5 222 M
+(restartRuns\(\) methods are provided so that _other_ classes \(specifically, the) s
+5 214 M
+(Test program that autogrades your project\) can read the contents of a) s
+5 206 M
+(run-length encoding.  If your RunLengthEncoding methods call them, they will) s
+5 198 M
+(mess up the position of the internal pointer for the other classes.) s
+5 182 M
+(IMPORTANT NOTE on TypeAndSize:  The Java "return" keyword only allows you to) s
+5 174 M
+(return one value from a method call.  But the nextRun\(\) method needs to return) s
+5 166 M
+(two values--the length of a run, and the type of object it contains.  How can) s
+5 158 M
+(it do this?  Answer:  by returning a "TypeAndSize" object.  A TypeAndSize) s
+5 150 M
+(object is nothing more than a way to return two integers at once.  That's it.) s
+5 142 M
+(Each time nextRun\(\) is called, it creates a TypeAndSize object \(or it will once) s
+5 134 M
+(you've coded it to do so\), fills in the values, and returns it to the calling) s
+5 126 M
+(routine, which then throws it away.  The TypeAndSize object is part of the) s
+5 118 M
+(predefined interface of your RunLengthEncoding class, so you CANNOT change it,) s
+5 110 M
+(because the calling programs \(including the autograder\) are relying on you to) s
+5 102 M
+(return TypeAndSize objects according to spec.  TypeAndSize objects are NOT) s
+5 94 M
+(suitable as a way to represent a run in your run-length encoding, because they) s
+5 86 M
+(do not encode a shark's hunger.) s
+5 70 M
+(Part II\(c\):  Implement a toOcean\(\) method in the RunLengthEncoding class, which) s
+5 62 M
+(converts a run-length encoding to an Ocean object.  To accomplish this, you) s
+5 54 M
+(will need to implement a new addShark\(\) method in the Ocean class, so that you) s
+5 46 M
+(can specify the hunger of each shark you add to the ocean.  This way, you can) s
+5 38 M
+(convert an Ocean to a run-length encoding and back again without forgetting how) s
+5 30 M
+(hungry each shark was.) s
+377 510 M
+(Read RunLengthEncoding.java carefully for an explanation of what methods you) s
+377 502 M
+(must write.  The fields of the Ocean class MUST be private, and the) s
+377 494 M
+(RunLengthEncoding class cannot manipulate these fields directly.  Hence, the) s
+377 486 M
+(toOcean\(\) method will rely upon the Ocean constructor and the addFish\(\) and) s
+377 478 M
+(addShark\(\) methods.) s
+377 462 M
+(You cannot change any of the prototypes in RunLengthEncoding.java, and you) s
+377 454 M
+(cannot change the file TypeAndSize.java.  Again, we will test your code by) s
+377 446 M
+(calling your methods directly.) s
+377 430 M
+(Part III:  Converting an Ocean to a Run-Length Encoding) s
+377 422 M
+(=======================================================) s
+377 414 M
+(This part is worth 25% of your total score.  \(5 points out of 20\).) s
+377 398 M
+(Next, write a RunLengthEncoding constructor that takes an Ocean object as its) s
+377 390 M
+(sole parameter and converts it into a run-length encoding of the Ocean.  To) s
+377 382 M
+(accomplish this, you will need to implement a sharkFeeding\(\) method in the) s
+377 374 M
+(Ocean class, which tells you how hungry a given shark is.  Read Ocean.java and) s
+377 366 M
+(RunLengthEncoding.java carefully for an explanation of what methods you must) s
+377 358 M
+(write.) s
+377 342 M
+(The fields of the Ocean class MUST be private, so the RunLengthEncoding) s
+377 334 M
+(constructor will rely upon the width\(\), height\(\), starveTime\(\), cellContents\(\),) s
+377 326 M
+(and sharkFeeding\(\) methods.) s
+377 310 M
+(Testing) s
+377 302 M
+(-------) s
+377 294 M
+(This is worth 1 point out of the 5, but should probably be done as soon as you) s
+377 286 M
+(can during Part III.) s
+377 270 M
+(Your RunLengthEncoding implementation is required to have a check\(\) method,) s
+377 262 M
+(which walks through the run-length encoding and checks its validity.) s
+377 254 M
+(Specifically, it should print a warning message if any of the following) s
+377 246 M
+(problems are found:) s
+377 230 M
+(    - If two consecutive runs have exactly the same type of contents.) s
+377 222 M
+(      For instance, an "F12" run followed by an "F8" run is illegal, because) s
+377 214 M
+(      they should have been consolidated into a single run.  \(Don't forget,) s
+377 206 M
+(      though, that sharks are divided based on how recently they've eaten.\)) s
+377 198 M
+(    - If the sum of all run lengths doesn't equal the size \(in cells\) of the) s
+377 190 M
+(      Ocean; i.e. its width times its height.) s
+377 174 M
+(You may find that the check\(\) method is very useful in helping to debug your) s
+377 166 M
+(RunLengthEncoding constructors and addFish\(\) and addShark\(\) in Part IV.) s
+377 150 M
+(Part IV:  Adding a Fish or Shark to a Run-Length Encoding) s
+377 142 M
+(=========================================================) s
+377 134 M
+(The last part is the hardest, but it is only worth 10% of the total score) s
+377 126 M
+(\(2 points out of 20\), so don't panic if you can't finish it.) s
+377 110 M
+(Implement the addFish\(\) and addShark\(\) methods of the RunLengthEncoding class,) s
+377 102 M
+(which are similar to the addFish\(\) and addShark\(\) methods of the Ocean class.) s
+377 94 M
+(However, this code is much trickier to write.  Observe that addFish\(\) and) s
+377 86 M
+(addShark\(\) can lengthen, or even shorten, an existing run-length encoding.  To) s
+377 78 M
+(add a shark or fish to a run-length encoded ocean, you will need to find the) s
+377 70 M
+(right run in the linked list, and perhaps break it apart into two or three) s
+377 62 M
+(runs.  If the new shark or fish is adjacent to other sharks or fish, you should) s
+377 54 M
+(consolidate runs to keep memory use down.  \(Your check\(\) method ensures that) s
+377 46 M
+(your encoding is as compact as possible.\)) s
+377 30 M
+(Your addFish\(\) and addShark\(\) routines should run in time proportional to the) s
+377 22 M
+(number of runs in the encoding.  Therefore, you may not convert the run-length) s
+377 14 M
+(encoding to an Ocean object, add the fish or shark to the Ocean, and then) s
+377 6 M
+(convert back to a run-length encoding; that is much too slow.) s
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+90 rotate
+24 -588 translate
+/pagenum 4 def
+/fname (readme) def
+/fdir () def
+/ftail (readme) def
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (09/13/06) def
+/modtimestr (22:13:12) def
+/user_header_p false def
+%%EndPageSetup
+column_lines
+do_header
+5 510 M
+(Submitting your Solution) s
+5 502 M
+(------------------------) s
+5 494 M
+(Make sure that your program compiles and runs on the _lab_ machines with the) s
+5 486 M
+(autograding program Test.class, which is included with the project files.) s
+5 478 M
+(\(To run it, compile your project, compile Test4.java, then run "java Test".\)) s
+5 470 M
+(The autograder will assign your project a score, which forms part of your final) s
+5 462 M
+(project score.  Please do not try to fake out the autograder by manually) s
+5 454 M
+(encoding the output it expects; if you do, a human reader will catch you, and) s
+5 446 M
+(we will prosecute cheating harshly.) s
+5 430 M
+(Change \(cd\) to your pj1 directory, which should contain Ocean.java,) s
+5 422 M
+(RunLengthEncoding.java, and any other .java files you wish to submit.) s
+5 414 M
+(From your pj1 directory, type "submit pj1".  After submitting, if you realize) s
+5 406 M
+(your solution is flawed, you may fix it and submit again.  You may submit as) s
+5 398 M
+(often as you like.  Only the last version you submit will be graded, unless you) s
+5 390 M
+(inform your reader that you would prefer to have an earlier submission graded) s
+5 382 M
+(instead.  If your submission is late, you will lose 1% of your earned score for) s
+5 374 M
+(every two hours \(rounded up\) your project is late.) s
+_R
+S
+%%Trailer
+%%Pages: 4
+%%DocumentNeededResources: font Times-Roman Courier-Bold Courier 
+%%+ font Times-Bold 
+%%EOF
