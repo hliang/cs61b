@@ -29,8 +29,11 @@ public class Ocean {
    *  Define any variables associated with an Ocean object here.  These
    *  variables MUST be private.
    */
-
-
+  private int oceanWidth  = 0;
+  private int oceanHeight = 0;
+  private int[][] oceanGrid;
+  private int starveTime = 0;
+  private int[][] hungerGrid;
 
   /**
    *  The following methods are required for Part I.
@@ -46,6 +49,11 @@ public class Ocean {
 
   public Ocean(int i, int j, int starveTime) {
     // Your solution here.
+    oceanWidth  = i;
+    oceanHeight = j;
+    oceanGrid  = new int[i][j];
+    this.starveTime = starveTime;
+    hungerGrid = new int[i][j];
   }
 
   /**
@@ -55,7 +63,7 @@ public class Ocean {
 
   public int width() {
     // Replace the following line with your solution.
-    return 1;
+    return oceanWidth;
   }
 
   /**
@@ -65,7 +73,7 @@ public class Ocean {
 
   public int height() {
     // Replace the following line with your solution.
-    return 1;
+    return oceanHeight;
   }
 
   /**
@@ -75,7 +83,64 @@ public class Ocean {
 
   public int starveTime() {
     // Replace the following line with your solution.
-    return 1;
+    return starveTime;
+  }
+
+  /**
+   * wrapAround() calculates a valid position in the grid.
+   * by "wrapping around" at the edges.
+   * wrapX() for X-coordinates.
+   * wrapY() for Y-coordinates.
+   */
+  private int wrapAround(int i, int n) {
+    int r = i % n;
+    if (r < 0) {
+      r += n;
+    }
+    return r;
+  }
+  private int wrapX(int i) {
+    return wrapAround(i, oceanWidth);
+  }
+  private int wrapY(int i) {
+    return wrapAround(i, oceanHeight);
+  }
+
+  /**
+   * neighbors() see who are around a cell.
+   * number of empty, fish, shark cells in the surrounding cells.
+   */
+  private int[] neighbors(int x, int y) {
+    int[] circle = new int[3];
+    for (int i = x - 1; i <= x + 1; i++) {
+      for (int j = y - 1; j <= y + 1; j++) {
+        if (i != x || j != y) {
+          int something = cellContents(wrapX(i), wrapY(j));
+          if (something == Ocean.FISH) {
+            circle[2]++;  // number of fish
+          } else if (something == Ocean.SHARK) {
+            circle[1]++;  // number of sharks
+          } else {
+            circle[0]++;  // number of empty cells
+          }
+        }
+      }
+    }
+    return circle;
+  }
+
+  /**
+   *  addEmpty() empty cell (x, y).
+   *  @param x is the x-coordinate of the cell to empty.
+   *  @param y is the y-coordinate of the cell to empty
+   */
+
+  public void addEmpty(int x, int y) {
+    // Your solution here.
+    x = wrapX(x);
+    y = wrapY(y);
+    oceanGrid[x][y] = EMPTY;
+    hungerGrid[x][y] = 0;
   }
 
   /**
@@ -87,6 +152,12 @@ public class Ocean {
 
   public void addFish(int x, int y) {
     // Your solution here.
+    x = wrapX(x);
+    y = wrapY(y);
+    if (cellContents(x,y) == EMPTY) {
+      oceanGrid[x][y] = FISH;
+      hungerGrid[x][y] = 0;
+    }
   }
 
   /**
@@ -99,6 +170,12 @@ public class Ocean {
 
   public void addShark(int x, int y) {
     // Your solution here.
+    x = wrapX(x);
+    y = wrapY(y);
+    if (cellContents(x,y) == EMPTY) {
+      oceanGrid[x][y] = SHARK;
+      hungerGrid[x][y] = 0;
+    }
   }
 
   /**
@@ -110,7 +187,9 @@ public class Ocean {
 
   public int cellContents(int x, int y) {
     // Replace the following line with your solution.
-    return EMPTY;
+    x = wrapX(x);
+    y = wrapY(y);
+    return oceanGrid[x][y];
   }
 
   /**
@@ -120,7 +199,57 @@ public class Ocean {
 
   public Ocean timeStep() {
     // Replace the following line with your solution.
-    return new Ocean(1, 1, 1);
+    int w = oceanWidth;
+    int h = oceanHeight;
+    int s = starveTime;
+    Ocean newOcean = new Ocean(w, h, s);
+    
+    for (int x = 0; x < w; x++) {
+      for (int y = 0; y < h; y++) {
+        int[] circle = neighbors(x,y); // circle[1], num of neighbor shark; circle[2], num of neighbor fish
+        int nShark = circle[1];  // number of neighbor sharks in surrounding cells
+        int nFish  = circle[2];  // number of neighbor fish   in surrounding cells
+        switch (cellContents(x,y)) {
+          case EMPTY:
+            if (nFish < 2 ) {
+              // remain empty
+            } else if (nFish >= 2 && nShark <= 1) {
+              // new fish born
+              newOcean.addFish(x, y);
+            } else if (nFish >= 2 && nShark >=2) {
+              // new shark born
+              newOcean.addShark(x,y);
+            }
+            break;
+          case SHARK:
+            if (nFish == 0) {  // shark has no fish to eat
+              // shark gets hungrier
+              hungerGrid[x][y]++;
+              if (hungerGrid[x][y] <= starveTime) { // hungry but can survive
+                newOcean.addShark(x,y);
+                newOcean.hungerGrid[x][y] = this.hungerGrid[x][y];
+              } else {    // starve to death, could not make it to the next ocean
+                newOcean.addEmpty(x,y);
+              }
+            } else if (nFish > 0) {  // happy yummy tummy :)
+              newOcean.addShark(x,y);
+            }
+            break;
+          case FISH:
+            if (nShark == 0) {     // no predator, yeah
+              // safe fish
+              newOcean.addFish(x,y);
+            } else if (nShark == 1) { // poor fish got eaten by the shark
+              newOcean.addEmpty(x,y);
+            } else if (nShark >= 2) { // breed new shark
+              newOcean.addShark(x,y);
+            }
+            break;
+        }
+      }
+    }
+
+    return newOcean;
   }
 
   /**
