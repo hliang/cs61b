@@ -83,9 +83,8 @@ public class DList {
    */
   public void insertFront(Object item) {
     // Your solution here.
-    DListNode tmpNode = newNode(item, head, head.next);
-    head.next.prev = tmpNode;
-    head.next = tmpNode;
+    head.next.prev = newNode(item, head, head.next);
+    head.next = head.next.prev;
     size++;
   }
 
@@ -96,9 +95,8 @@ public class DList {
    */
   public void insertBack(Object item) {
     // Your solution here.
-    DListNode tmpNode = newNode(item, head.prev, head);
-    head.prev.next = tmpNode;
-    head.prev = tmpNode;
+    head.prev.next = newNode(item, head.prev, head);
+    head.prev = head.prev.next;
     size++;
   }
 
@@ -182,9 +180,8 @@ public class DList {
   public void insertAfter(Object item, DListNode node) {
     // Your solution here.
     if (node != null) {
-      DListNode tmpNode = newNode(item, node, node.next);
-      node.next.prev = tmpNode;
-      node.next = tmpNode;
+      node.next.prev = newNode(item, node, node.next);;
+      node.next = node.next.prev;
       size++;
     }
   }
@@ -199,9 +196,8 @@ public class DList {
   public void insertBefore(Object item, DListNode node) {
     // Your solution here.
     if (node != null) {
-      DListNode tmpNode = newNode(item, node.prev, node);
-      node.prev.next = tmpNode;
-      node.prev = tmpNode;
+      node.prev.next = newNode(item, node.prev, node);
+      node.prev = node.prev.next;
       size++;
     }
   }
@@ -288,7 +284,7 @@ public class DList {
 	System.out.println(testList.length());
 
         DList l = new DList();
-		System.out.println("###Testing insertFront ###\nEmpty list is" + l);
+		System.out.println("\n\n###Testing insertFront ###\nEmpty list is" + l);
 		l.insertFront(9);
 		System.out.println("\nInserting 9 at front. \nList with 9 is " + l);
 		l.insertFront(8);
@@ -297,7 +293,7 @@ public class DList {
 		l.insertAfter(6, l.head);
 		System.out.println("\nInserting 6 after head. nList with 6, 7, 8, 9 is "+l);
 		l.remove(l.head.next);
-		System.out.println("Removed head.next, should return a list of 7, 8, 9. nList with 7, 8, 9 is " + l);
+		System.out.println("\nRemoved head.next, should return a list of 7, 8, 9. nList with 7, 8, 9 is " + l);
         /*
 		LockDList m = new LockDList();
 		m.insertFront(9);
