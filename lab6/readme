@@ -36,6 +36,7 @@ Excepting the withdraw bug, the program handles errors correctly, but does so
 rather clumsily in the code.  For instance, when you try to deposit to a
 nonexistent account, two error messages are printed.  (Why?)  Error-handling is
 not done well.
+Answer: The two errors printed by deposit method and balanceInquiry method.
 
 Part II:  Throwing Exceptions (2 points)
 ----------------------------------------
