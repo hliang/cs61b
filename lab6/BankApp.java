@@ -17,25 +17,29 @@ public class BankApp {
     usage();
     BankApp bankApp = new BankApp();
 
-    String command = bankApp.readLine("--> ");
-    while (!command.equals("quit")) {
-      try {
-	if (command.equals("open")) {
-	  bankApp.open();
-	} else if (command.equals("deposit")) {
-	  bankApp.doDeposit();
-	} else if (command.equals("withdraw")) {
-	  bankApp.doWithdraw();
-	} else if (command.equals("inquire")) {
-	  bankApp.doInquire();
-	} else {
-	  System.err.println("Invalid command: " + command);
-	  usage();
-	}
-      } catch(IOException e) {
-	System.err.println(e);
+    try {
+      String command = bankApp.readLine("--> ");
+      while (!command.equals("quit")) {
+        try {
+	      if (command.equals("open")) {
+	        bankApp.open();
+	      } else if (command.equals("deposit")) {
+	        bankApp.doDeposit();
+	      } else if (command.equals("withdraw")) {
+	        bankApp.doWithdraw();
+	      } else if (command.equals("inquire")) {
+	        bankApp.doInquire();
+	      } else {
+	        System.err.println("Invalid command: " + command);
+	        usage();
+	      }
+        } catch(IOException e) {
+	      System.err.println(e);
+        }
+        command = bankApp.readLine("--> ");
       }
-      command = bankApp.readLine("--> ");
+    } catch (IOException e) {
+      System.out.println(e);
     }
   }
 
