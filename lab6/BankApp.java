@@ -33,6 +33,8 @@ public class BankApp {
 	        System.err.println("Invalid command: " + command);
 	        usage();
 	      }
+        } catch(BadAccountException e1) {
+          System.out.println(e1);
         } catch(IOException e) {
 	      System.err.println(e);
         }
@@ -65,7 +67,7 @@ public class BankApp {
   *  deposit transaction on that account. 
   *  @exception IOException if there are problems reading user input.
   */
-  private void doDeposit() throws IOException {
+  private void doDeposit() throws IOException, BadAccountException {
     // Get account number.
     int acctNumber = readInt("Enter account number: ");
     int amount = readInt("Enter amount to deposit: ");
@@ -80,7 +82,7 @@ public class BankApp {
    *  to perform a withdrawal transaction from that account.
    *  @exception IOException if there are problems reading user input.
    */
-  private void doWithdraw() throws IOException {
+  private void doWithdraw() throws IOException, BadAccountException {
     // Get account number.
     int acctNumber = readInt("Enter account number: ");
     int amount = readInt("Enter amount to withdraw: ");
@@ -95,7 +97,7 @@ public class BankApp {
    *  discover and print that account's balance.
    *  @exception IOException if there are problems reading user input.
    */
-  private void doInquire() throws IOException {
+  private void doInquire() throws IOException, BadAccountException {
     int acctNumber = readInt("Enter account number: ");
 
     System.out.println("Balance for #" + acctNumber + " is " +
