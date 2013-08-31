@@ -36,8 +36,11 @@ public class VirtualTeller {
    *  @param acct is an account number.
    *  @param amount an amount of money.
    */
-  public void withdraw(int acct, int amount) throws BadAccountException {
+  public void withdraw(int acct, int amount) throws BadAccountException, BadTransactionException {
     AccountData account = findAccount(acct);
+    if (amount < 0) {
+        throw new BadTransactionException(amount);
+    }
 
     //if (account == null) {   // Didn't find the account.
     //  System.out.println("Error:  Couldn't find account number `" +

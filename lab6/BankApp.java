@@ -35,6 +35,8 @@ public class BankApp {
 	      }
         } catch(BadAccountException e1) {
           System.out.println(e1);
+        } catch(BadTransactionException e2) {
+          System.out.println(e2);
         } catch(IOException e) {
 	      System.err.println(e);
         }
@@ -82,7 +84,7 @@ public class BankApp {
    *  to perform a withdrawal transaction from that account.
    *  @exception IOException if there are problems reading user input.
    */
-  private void doWithdraw() throws IOException, BadAccountException {
+  private void doWithdraw() throws IOException, BadAccountException, BadTransactionException {
     // Get account number.
     int acctNumber = readInt("Enter account number: ");
     int amount = readInt("Enter amount to withdraw: ");
