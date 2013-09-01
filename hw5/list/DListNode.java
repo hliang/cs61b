@@ -99,6 +99,9 @@ public class DListNode extends ListNode {
     //   "this" is null.  Remember that this node's "myList" field tells you
     //   what DList it's in.  You should use myList.newNode() to create the
     //   new node.
+    this.next.prev = ((DList) myList).newNode(item, (DList) myList, this, this.next);
+    this.next = this.next.prev;
+    myList.size++;
   }
 
   /**
@@ -119,6 +122,11 @@ public class DListNode extends ListNode {
     //   "this" is null.  Remember that this node's "myList" field tells you
     //   what DList it's in.  You should use myList.newNode() to create the
     //   new node.
+    this.prev.next = ((DList) myList).newNode(item, (DList) myList, this.prev, this);
+    // cast is necessary, otherwise compile-time error occurs. e.g.:
+    // newNode(java.lang.Object,list.DList,list.DListNode,list.DListNode) in list.DList cannot be applied to       (java.lang.Object,list.List,list.DListNode,list.DListNode)
+    this.prev = this.prev.next;
+    myList.size++;
   }
 
   /**
@@ -137,8 +145,9 @@ public class DListNode extends ListNode {
     //   but changes are necessary.  For instance, there is no need to check if
     //   "this" is null.  Remember that this node's "myList" field tells you
     //   what DList it's in.
-
-
+    this.prev.next = this.next;
+    this.next.prev = this.prev;
+    myList.size--;
 
     // Make this node an invalid node, so it cannot be used to corrupt myList.
     myList = null;
