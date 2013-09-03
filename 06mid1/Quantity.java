@@ -7,15 +7,15 @@ public class Quantity {
     // Constructor.
     public Quantity(String thingString, double amount) {
         thing = thingString;
-        amount = amount;
+        this.amount = amount;
     }
     // Constructor for thing with quantity 100. Calls the other constructor.
     public Quantity(String thingString) {
-        Quantity(thingString, 100.0);
+        this(thingString, 100.0); // Constructors use this to refer to another constructor in the same class with a different parameter list.
     }
 
     public static void main(String[] args) {
-        Quantity q = Quantity("I love Java this much: ");
-        System.out.println(this.thing + this.amount);
+        Quantity q = new Quantity("I love Java this much: ");
+        System.out.println(q.thing + q.amount);
     }
 }
